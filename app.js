@@ -899,6 +899,9 @@ function saveAll() {
   localStorage.setItem("mc_chats_v12", JSON.stringify(chats));
   localStorage.setItem("mc_deals_v6", JSON.stringify(dealsHistory));
   updateChatBadge();
+  if (typeof pushStateToCloud === "function") {
+    pushStateToCloud();
+  }
 }
 
 function applyTranslations(langCode) {
@@ -1681,12 +1684,23 @@ function previewProductImg(e) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    uploadedBase64 = reader.result;
-    const prev = document.getElementById("prodImagePreview");
-    const status = document.getElementById("prodImgStatus");
-    prev.src = uploadedBase64;
-    prev.classList.remove("hidden");
-    if (status) status.classList.remove("hidden");
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 760;
+      const scale = img.width > maxW ? (maxW / img.width) : 1;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      uploadedBase64 = canvas.toDataURL("image/jpeg", 0.72);
+      const prev = document.getElementById("prodImagePreview");
+      const status = document.getElementById("prodImgStatus");
+      prev.src = uploadedBase64;
+      prev.classList.remove("hidden");
+      if (status) status.classList.remove("hidden");
+    };
+    img.src = reader.result;
   };
   reader.readAsDataURL(file);
 }
@@ -1954,9 +1968,177 @@ if (langSelectEl) {
   langSelectEl.addEventListener("change", (ev) => applyTranslations(ev.target.value));
 }
 
+
+// Sincronización gratuita en la nube vía Firebase Firestore (plan Spark)
+const CLOUD_CONFIG_STORAGE_KEY = "mc_firebase_config_v1";
+const CLOUD_DOC_PATH = ["mezquitalconecta_shared", "public_state"];
+
+let cloudDb = null;
+let cloudUnsubscribe = null;
+let isApplyingCloudSnapshot = false;
+
+function getStoredCloudConfig() {
+  try {
+    const raw = localStorage.getItem(CLOUD_CONFIG_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.apiKey && parsed.projectId) return parsed;
+  } catch (err) {}
+  return null;
+}
+
+function parseLooseFirebaseConfig(inputText) {
+  const cleaned = (inputText || "").trim();
+  if (!cleaned) return null;
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {}
+  // Permitir pegar bloque JS tipo: apiKey: "...", projectId: "..."
+  const extractField = (field) => {
+    const m = cleaned.match(new RegExp(field + "\s*:\s*['\"]([^'\"]+)['\"]"));
+    return m ? m[1] : "";
+  };
+  const cfg = {
+    apiKey: extractField("apiKey"),
+    authDomain: extractField("authDomain"),
+    projectId: extractField("projectId"),
+    storageBucket: extractField("storageBucket"),
+    messagingSenderId: extractField("messagingSenderId"),
+    appId: extractField("appId")
+  };
+  if (cfg.apiKey && cfg.projectId) return cfg;
+  throw new Error("Configuración incompleta. Asegúrate de incluir apiKey y projectId.");
+}
+
+function updateCloudBadgeUi(active) {
+  const lbl = document.getElementById("cloudSyncLabel");
+  const btn = document.getElementById("cloudSyncBtn");
+  if (lbl) {
+    lbl.textContent = active ? "Nube Activa" : "Conectar Nube";
+  }
+  if (btn) {
+    if (active) {
+      btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-300/50 px-2.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition shadow-sm";
+    } else {
+      btn.className = "bg-emerald-900/70 hover:bg-emerald-800 text-emerald-100 border border-emerald-400/30 px-2.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition";
+    }
+  }
+}
+
+function openCloudConfigModal() {
+  const existing = getStoredCloudConfig();
+  const ta = document.getElementById("cloudConfigJsonInput");
+  const banner = document.getElementById("cloudStatusBanner");
+  if (ta) {
+    ta.value = existing ? JSON.stringify(existing, null, 2) : "";
+  }
+  if (banner) {
+    if (cloudDb && existing) {
+      banner.className = "bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 font-semibold";
+      banner.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-700 mr-1"></i> Conectado a la nube (Proyecto: <strong>${existing.projectId}</strong>). Los cambios se comparten entre dispositivos.`;
+    } else {
+      banner.className = "bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950";
+      banner.innerHTML = `<strong>Modo local activo:</strong> Aún no has pegado tu configuración gratuita de Firebase. Sin ella, los cambios solo se guardan en este equipo.`;
+    }
+  }
+  openModal("cloudConfigModal");
+}
+
+function saveCloudConfigFromForm(e) {
+  e.preventDefault();
+  const raw = document.getElementById("cloudConfigJsonInput")?.value || "";
+  try {
+    const cfg = parseLooseFirebaseConfig(raw);
+    if (!cfg) {
+      alert("Pega tu configuración de Firebase antes de guardar.");
+      return;
+    }
+    localStorage.setItem(CLOUD_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
+    initCloudSync(true);
+    closeModal("cloudConfigModal");
+  } catch (err) {
+    alert(err.message || "No se pudo leer la configuración de Firebase.");
+  }
+}
+
+function clearCloudConfig() {
+  localStorage.removeItem(CLOUD_CONFIG_STORAGE_KEY);
+  if (typeof cloudUnsubscribe === "function") {
+    cloudUnsubscribe();
+    cloudUnsubscribe = null;
+  }
+  cloudDb = null;
+  updateCloudBadgeUi(false);
+  closeModal("cloudConfigModal");
+}
+
+function pushStateToCloud() {
+  if (!cloudDb || isApplyingCloudSnapshot) return;
+  try {
+    cloudDb.collection(CLOUD_DOC_PATH[0]).doc(CLOUD_DOC_PATH[1]).set({
+      products: products,
+      adminDeletionLogs: typeof adminDeletionLogs !== "undefined" ? adminDeletionLogs : [],
+      updatedAt: new Date().toISOString()
+    }, { merge: true }).catch(() => {});
+  } catch (err) {}
+}
+
+function initCloudSync(pushInitialIfEmpty) {
+  const cfg = getStoredCloudConfig();
+  if (!cfg || typeof firebase === "undefined" || !firebase.firestore) {
+    updateCloudBadgeUi(false);
+    return;
+  }
+
+  try {
+    const appName = "mezquitalconecta_cloud_app";
+    let appInstance = null;
+    try {
+      appInstance = firebase.app(appName);
+    } catch (e) {
+      appInstance = firebase.initializeApp(cfg, appName);
+    }
+    cloudDb = appInstance.firestore();
+    updateCloudBadgeUi(true);
+
+    if (typeof cloudUnsubscribe === "function") {
+      cloudUnsubscribe();
+    }
+
+    const docRef = cloudDb.collection(CLOUD_DOC_PATH[0]).doc(CLOUD_DOC_PATH[1]);
+    cloudUnsubscribe = docRef.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (pushInitialIfEmpty) pushStateToCloud();
+        return;
+      }
+      const data = snap.data() || {};
+      isApplyingCloudSnapshot = true;
+      try {
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          products = data.products;
+          localStorage.setItem("mc_products_v6", JSON.stringify(products));
+        }
+        if (Array.isArray(data.adminDeletionLogs) && typeof adminDeletionLogs !== "undefined") {
+          adminDeletionLogs = data.adminDeletionLogs;
+          localStorage.setItem("mc_admin_deletions_v14", JSON.stringify(adminDeletionLogs));
+        }
+        if (typeof renderCatalog === "function") renderCatalog();
+        if (typeof renderWhatsAppSidebar === "function") renderWhatsAppSidebar();
+      } finally {
+        isApplyingCloudSnapshot = false;
+      }
+    }, () => {
+      updateCloudBadgeUi(false);
+    });
+  } catch (err) {
+    updateCloudBadgeUi(false);
+  }
+}
+
 // Inicialización
 document.getElementById("navUserName").textContent = (currentUser && currentUser.registered && currentUser.name) ? currentUser.name.split(" ")[0] : "Registrarse";
 updateChatBadge();
 calculateBarter();
 syncAdminUiVisibility();
+initCloudSync(false);
 applyTranslations(currentLang);

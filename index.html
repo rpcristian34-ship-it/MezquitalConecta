@@ -129,6 +129,12 @@
           <span data-i18n="publishBtn">Publicar</span>
         </button>
 
+        
+        <button type="button" id="cloudSyncBtn" onclick="openCloudConfigModal()" class="bg-emerald-900/70 hover:bg-emerald-800 text-emerald-100 border border-emerald-400/30 px-2.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition" title="Configurar sincronización en la nube para todos los teléfonos">
+          <i class="fa-solid fa-cloud"></i>
+          <span id="cloudSyncLabel" class="hidden md:inline">Nube Local</span>
+        </button>
+
         <button type="button" id="adminHeaderBtn" onclick="openAdminPanel()" class="hidden bg-red-600 hover:bg-red-500 text-white border border-red-300/40 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition shadow-sm">
           <i class="fa-solid fa-shield-halved"></i>
           <span class="hidden sm:inline">Admin</span>
@@ -910,6 +916,53 @@
     </div>
   </div>
 
+  
+  <!-- MODAL: CONEXIÓN GRATUITA EN LA NUBE (TODOS LOS TELÉFONOS) -->
+  <div id="cloudConfigModal" class="hidden fixed inset-0 bg-stone-950/80 z-[75] flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-extrabold text-sm sm:text-base">
+          <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+          <span>Sincronización en la Nube (Todos los Teléfonos)</span>
+        </div>
+        <button type="button" onclick="closeModal('cloudConfigModal')" class="text-white/80 hover:text-white text-xl leading-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="saveCloudConfigFromForm(event)" class="p-5 space-y-3.5 text-xs sm:text-sm">
+        <div id="cloudStatusBanner" class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950"></div>
+
+        <p class="text-xs text-stone-600 leading-relaxed">
+          Pega aquí la configuración gratuita de tu proyecto de <strong>Firebase (Cloud Firestore)</strong>. Una vez guardada, cuando subas un producto con foto o elimines algo como Admin en un teléfono, aparecerá en los demás teléfonos que abran la página.
+        </p>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800 text-xs">Pega tu objeto <code>firebaseConfig</code> (o JSON de Firebase):</label>
+          <textarea id="cloudConfigJsonInput" rows="6" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "tu-proyecto.firebaseapp.com",
+  "projectId": "tu-proyecto",
+  "storageBucket": "tu-proyecto.appspot.com",
+  "messagingSenderId": "123456",
+  "appId": "1:123456:web:abc"
+}' class="w-full border border-stone-300 rounded-xl p-2.5 font-mono text-xs bg-stone-50"></textarea>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <button type="button" onclick="clearCloudConfig()" class="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-3.5 py-2.5 rounded-xl text-xs transition">
+            Usar solo este teléfono
+          </button>
+          <button type="submit" class="bg-mezquital-deep hover:bg-mezquital-forest text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-check-circle"></i> Conectar y Sincronizar Nube
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
