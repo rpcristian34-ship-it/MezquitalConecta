@@ -851,7 +851,6 @@ function translateChatMessage(msg, targetLang) {
     return { displayText: translatedTokens.join(""), isTranslated: true, sourceLang };
   }
 
-  // Si es una frase libre sin coincidencia directa, mostrar el texto limpio sin etiquetas artificiales
   return { displayText: rawText, isTranslated: false, sourceLang };
 }
 
@@ -1064,7 +1063,6 @@ function renderWhatsAppConversation() {
 
   box.innerHTML = msgs.map(m => {
     const isMe = m.sender === currentUser.name;
-    // Si habla la otra persona, se traduce a tu idioma (currentLang); si hablas tú, se traduce al idioma de la otra persona (partnerLang)
     const viewerLang = isMe ? partnerLang : currentLang;
     const tr = m.isMap ? { displayText: m.text, isTranslated: false } : translateChatMessage(m, viewerLang);
     const safeSpoken = encodeURIComponent(`${m.sender} dice: ${tr.displayText}`);
@@ -1086,8 +1084,6 @@ function renderWhatsAppConversation() {
 
   box.scrollTop = box.scrollHeight;
 }
-
-
 
 let adminDeletionLogs = JSON.parse(localStorage.getItem("mc_admin_deletions_v14")) || [];
 
@@ -1157,7 +1153,6 @@ function activateSupremeAdminMode(sourcePlace) {
   }
 }
 
-
 function openSingleAdminDelete(productId) {
   if (!moderationState || !moderationState.isAdmin) return;
   const prod = products.find(p => p.id === productId);
@@ -1167,7 +1162,7 @@ function openSingleAdminDelete(productId) {
   document.getElementById("singleAdminDeleteProductId").value = prod.id;
   document.getElementById("singleAdminDeleteReason").value = "";
   document.getElementById("singleAdminDeletePreview").innerHTML = `
-    <img src="${prod.img}" alt="${loc.title}" class="w-16 h-16 rounded-xl object-cover border border-red-200 shrink-0" />
+    <img src="${prod.img || prod.image}" alt="${loc.title}" class="w-16 h-16 rounded-xl object-cover border border-red-200 shrink-0" />
     <div class="min-w-0 text-xs space-y-0.5">
       <div class="font-extrabold text-stone-900 truncate">${loc.title}</div>
       <div class="text-stone-700 font-semibold">Publicado por: <span class="text-red-800">${prod.seller}</span></div>
@@ -1711,7 +1706,6 @@ function makeOfflineSvgPlaceholder(titleText) {
   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 
-
 function syncKiloFromUnitIfKilos() {
   const unit = document.getElementById("prodUnit")?.value;
   const price = document.getElementById("prodPrice")?.value;
@@ -1842,11 +1836,11 @@ function openProfileOrAuth() {
     <div class="space-y-4">
       <div class="flex items-center gap-3.5 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
         <div class="w-14 h-14 rounded-full bg-mezquital-deep text-white flex items-center justify-center text-xl font-bold overflow-hidden shrink-0">
-          ${currentUser.avatar ? `<img src="${currentUser.avatar}" class="w-full h-full object-cover" />` : currentUser.name[0]}
+          ${currentUser.avatar ? `<img src="${currentUser.avatar}" class="w-full h-full object-cover" />` : (currentUser.name ? currentUser.name[0] : "M")}
         </div>
         <div class="min-w-0">
-          <h4 class="font-extrabold text-base text-stone-900 truncate">${currentUser.name}</h4>
-          <p class="text-xs text-stone-600 truncate">${currentUser.email} • ${currentUser.community}</p>
+          <h4 class="font-extrabold text-base text-stone-900 truncate">${currentUser.name || "Invitado"}</h4>
+          <p class="text-xs text-stone-600 truncate">${currentUser.email || "Sin correo"} • ${currentUser.community}</p>
           <span class="inline-block mt-1.5 bg-white text-mezquital-deep border border-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
             <i class="fa-solid fa-circle-check mr-1"></i> ${currentUser.authMethod || "Usuario Verificado"}
           </span>
@@ -1968,9 +1962,18 @@ if (langSelectEl) {
   langSelectEl.addEventListener("change", (ev) => applyTranslations(ev.target.value));
 }
 
+// Sincronización automática en la nube vía Firebase Firestore (configuración por defecto embebida)
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAxYx9Dohk1tQ0kLf5FgPwQMe7JKYMGgGk",
+  authDomain: "mezquitalconecta.firebaseapp.com",
+  projectId: "mezquitalconecta",
+  storageBucket: "mezquitalconecta.firebasestorage.app",
+  messagingSenderId: "318120807147",
+  appId: "1:318120807147:web:5c4c2245a1af68b8dc8cae"
+};
 
-// Sincronización gratuita en la nube vía Firebase Firestore (plan Spark)
 const CLOUD_CONFIG_STORAGE_KEY = "mc_firebase_config_v1";
+const CLOUD_DISABLED_KEY = "mc_firebase_disabled_v1";
 const CLOUD_DOC_PATH = ["mezquitalconecta_shared", "public_state"];
 
 let cloudDb = null;
@@ -1978,13 +1981,17 @@ let cloudUnsubscribe = null;
 let isApplyingCloudSnapshot = false;
 
 function getStoredCloudConfig() {
+  if (localStorage.getItem(CLOUD_DISABLED_KEY) === "1") {
+    return null;
+  }
   try {
     const raw = localStorage.getItem(CLOUD_CONFIG_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && parsed.apiKey && parsed.projectId) return parsed;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.apiKey && parsed.projectId) return parsed;
+    }
   } catch (err) {}
-  return null;
+  return DEFAULT_FIREBASE_CONFIG;
 }
 
 function parseLooseFirebaseConfig(inputText) {
@@ -1993,9 +2000,8 @@ function parseLooseFirebaseConfig(inputText) {
   try {
     return JSON.parse(cleaned);
   } catch (e) {}
-  // Permitir pegar bloque JS tipo: apiKey: "...", projectId: "..."
   const extractField = (field) => {
-    const m = cleaned.match(new RegExp(field + "\s*:\s*['\"]([^'\"]+)['\"]"));
+    const m = cleaned.match(new RegExp(field + "\\s*:\\s*['\"]([^'\"]+)['\"]"));
     return m ? m[1] : "";
   };
   const cfg = {
@@ -2026,19 +2032,19 @@ function updateCloudBadgeUi(active) {
 }
 
 function openCloudConfigModal() {
-  const existing = getStoredCloudConfig();
+  const existing = getStoredCloudConfig() || DEFAULT_FIREBASE_CONFIG;
   const ta = document.getElementById("cloudConfigJsonInput");
   const banner = document.getElementById("cloudStatusBanner");
   if (ta) {
-    ta.value = existing ? JSON.stringify(existing, null, 2) : "";
+    ta.value = JSON.stringify(existing, null, 2);
   }
   if (banner) {
     if (cloudDb && existing) {
       banner.className = "bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 font-semibold";
-      banner.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-700 mr-1"></i> Conectado a la nube (Proyecto: <strong>${existing.projectId}</strong>). Los cambios se comparten entre dispositivos.`;
+      banner.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-700 mr-1"></i> Nube automática activa (Proyecto: <strong>${existing.projectId}</strong>). Todos los dispositivos comparten el catálogo.`;
     } else {
       banner.className = "bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950";
-      banner.innerHTML = `<strong>Modo local activo:</strong> Aún no has pegado tu configuración gratuita de Firebase. Sin ella, los cambios solo se guardan en este equipo.`;
+      banner.innerHTML = `<strong>Sincronización en pausa:</strong> Guarda la configuración para activar el catálogo compartido entre dispositivos.`;
     }
   }
   openModal("cloudConfigModal");
@@ -2053,6 +2059,7 @@ function saveCloudConfigFromForm(e) {
       alert("Pega tu configuración de Firebase antes de guardar.");
       return;
     }
+    localStorage.removeItem(CLOUD_DISABLED_KEY);
     localStorage.setItem(CLOUD_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
     initCloudSync(true);
     closeModal("cloudConfigModal");
@@ -2063,6 +2070,7 @@ function saveCloudConfigFromForm(e) {
 
 function clearCloudConfig() {
   localStorage.removeItem(CLOUD_CONFIG_STORAGE_KEY);
+  localStorage.setItem(CLOUD_DISABLED_KEY, "1");
   if (typeof cloudUnsubscribe === "function") {
     cloudUnsubscribe();
     cloudUnsubscribe = null;
@@ -2140,5 +2148,5 @@ document.getElementById("navUserName").textContent = (currentUser && currentUser
 updateChatBadge();
 calculateBarter();
 syncAdminUiVisibility();
-initCloudSync(false);
+initCloudSync(true);
 applyTranslations(currentLang);
