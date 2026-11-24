@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>MEZQUITALCONECTA | Red Comunitaria Agrícola, Artesanal y Trueque 2.0</title>
+  <meta name="theme-color" content="#143D24" />
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --base-font-size: 16px; }
+    html { font-size: var(--base-font-size); }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F5F2EB;
+      color: #1A241E;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+    .bg-mezquital-deep { background-color: #143D24; }
+    .bg-mezquital-forest { background-color: #1E5631; }
+    .text-mezquital-deep { color: #143D24; }
+    .text-mezquital-forest { color: #1E5631; }
+    .hero-slide {
+      transition: opacity 0.65s ease, transform 0.8s ease;
+    }
+    .listening-pulse { animation: pulseRing 1.3s infinite; }
+    @keyframes pulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); }
+      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+    .glass-pill {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .wa-bg {
+      background-color: #EFEAE2;
+      background-image: radial-gradient(rgba(20, 61, 36, 0.06) 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+  </style>
+</head>
+<body class="pb-28 md:pb-12 antialiased selection:bg-amber-300 selection:text-stone-950">
+
+  <!-- Barra Superior Familiar, de Tamaño de Letra e Idiomas -->
+  <div class="bg-[#0D2717] text-stone-100 text-xs py-2.5 px-3 sm:px-6 border-b border-emerald-900/60">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span id="offlineBadge" class="hidden bg-amber-600 text-white px-2.5 py-0.5 rounded-full font-semibold shrink-0">
+          <i class="fa-solid fa-wifi-slash mr-1"></i> <span data-i18n="offlineTag">Sin Conexión (Caché Activa)</span>
+        </span>
+        <span class="text-emerald-100/90 font-medium truncate" data-i18n="topBanner">
+          Valle del Mezquital, Hidalgo • Red Familiar y Comunitaria Sin Intermediarios
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Tamaño de letra accesible -->
+        <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg border border-white/10">
+          <span class="text-emerald-100/90 hidden sm:inline mr-1" data-i18n="fontLabel">Letra:</span>
+          <button type="button" onclick="changeFontSize(-2)" class="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded font-bold transition" title="Reducir letra">A-</button>
+          <button type="button" onclick="changeFontSize(2)" class="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded font-bold transition" title="Aumentar letra">A+</button>
+        </div>
+
+        <!-- Selector de Idioma: Español / Hñähñu (Otomí) / Nañu / Náhuatl -->
+        <div class="flex items-center gap-1.5 bg-amber-500 text-stone-950 px-2.5 py-1 rounded-lg font-bold shadow-sm">
+          <i class="fa-solid fa-language"></i>
+          <label for="langSelect" class="sr-only">Seleccionar idioma</label>
+          <select id="langSelect" class="bg-transparent text-stone-950 font-extrabold text-xs focus:outline-none cursor-pointer">
+            <option value="es">Español</option>
+            <option value="oto">Hñähñu (Otomí)</option>
+            <option value="nanu">Nañu</option>
+            <option value="nah">Náhuatl</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cabecera Principal Responsiva -->
+  <header class="bg-mezquital-deep text-white shadow-md sticky top-0 z-40 border-b border-emerald-900">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <button type="button" onclick="switchView('catalog')" class="flex items-center gap-3 shrink-0 text-left">
+        <div class="bg-amber-400 text-[#143D24] w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl font-extrabold shadow-sm">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div>
+          <span class="block text-base sm:text-xl font-extrabold tracking-tight leading-none font-display">
+            MEZQUITAL<span class="text-amber-400">CONECTA</span>
+          </span>
+          <span class="block text-[11px] sm:text-xs text-emerald-200/90 mt-0.5" data-i18n="subtitle">
+            Catálogo Agrícola, Artesanal y Trueque 2.0
+          </span>
+        </div>
+      </button>
+
+      <!-- Buscador con Dictado por Voz -->
+      <div class="order-3 lg:order-2 w-full lg:w-auto lg:flex-1 max-w-xl flex items-center bg-white rounded-xl overflow-hidden px-3.5 py-2 shadow-sm">
+        <i class="fa-solid fa-magnifying-glass text-stone-400 mr-2.5 text-sm"></i>
+        <input id="searchInput" type="text" oninput="renderCatalog()" data-i18n-placeholder="searchPlaceholder" placeholder="Buscar nopal, miel, bordado, ixtle..." class="w-full text-stone-800 text-sm focus:outline-none bg-transparent" />
+        <button type="button" onclick="startVoiceSearch()" class="text-mezquital-forest hover:text-amber-600 px-2 py-0.5 rounded-md transition" title="Buscar por voz">
+          <i class="fa-solid fa-microphone text-base"></i>
+        </button>
+      </div>
+
+      <!-- Navegación Principal -->
+      <div class="order-2 lg:order-3 flex items-center gap-1.5 sm:gap-2">
+        <button type="button" id="navCatalogBtn" onclick="switchView('catalog')" class="bg-white/15 hover:bg-white/25 border border-white/20 px-2.5 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-store text-amber-300"></i>
+          <span class="hidden sm:inline" data-i18n="navCatalog">Catálogo</span>
+        </button>
+
+        <button type="button" id="navChatBtn" onclick="switchView('chat')" class="relative bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/40 px-2.5 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+          <i class="fa-solid fa-comments text-white"></i>
+          <span class="hidden sm:inline" data-i18n="navChat">Chats</span>
+          <span id="chatCountBadge" class="bg-amber-400 text-stone-950 text-[11px] font-extrabold px-1.5 py-0.2 rounded-full">0</span>
+        </button>
+
+        <button type="button" onclick="openPublishModal()" class="bg-amber-500 hover:bg-amber-400 text-stone-950 px-2.5 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition shadow-sm">
+          <i class="fa-solid fa-plus"></i>
+          <span data-i18n="publishBtn">Publicar</span>
+        </button>
+
+        <button type="button" id="adminHeaderBtn" onclick="openAdminPanel()" class="hidden bg-red-600 hover:bg-red-500 text-white border border-red-300/40 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition shadow-sm">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span class="hidden sm:inline">Admin</span>
+        </button>
+
+        <button type="button" id="authNavBtn" onclick="openProfileOrAuth()" class="bg-white text-mezquital-deep hover:bg-stone-100 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+          <i class="fa-solid fa-user-check text-mezquital-forest"></i>
+          <span id="navUserName" class="max-w-[75px] sm:max-w-none truncate">Mi Cuenta</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VISTA 1: CATÁLOGO, CARRUSEL DE NATURALEZA Y HERRAMIENTAS -->
+  <main id="catalogView">
+    <!-- Carrusel Principal de Naturaleza, Campo y Artesanía -->
+    <section class="max-w-7xl mx-auto mt-4 sm:mt-6 px-3 sm:px-6">
+      <div id="heroCarouselBox" class="relative h-72 sm:h-96 lg:h-[430px] rounded-3xl overflow-hidden shadow-lg border border-stone-200/90 bg-stone-900 select-none">
+
+        <div class="hero-slide absolute inset-0 opacity-100 z-10">
+          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85" alt="Paisaje natural y parcelas agrícolas" class="w-full h-full object-cover object-center" />
+          <div class="absolute inset-0 bg-gradient-to-r from-[#0B2214]/90 via-[#0F311D]/65 to-transparent flex items-end sm:items-center p-5 sm:p-10 lg:p-14">
+            <div class="max-w-2xl text-white space-y-2.5 sm:space-y-4">
+              <span class="glass-pill inline-flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-300/35 text-emerald-100 text-[11px] sm:text-xs font-bold px-3 py-1 rounded-full" data-i18n="hero1Badge">
+                NATURALEZA Y COSECHA FAMILIAR
+              </span>
+              <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-sm" data-i18n="hero1Title">
+                Del Campo y la Naturaleza Directo a tu Hogar
+              </h2>
+              <p class="text-xs sm:text-base text-stone-100/95 max-w-xl leading-relaxed" data-i18n="hero1Desc">
+                Conecta de manera directa y segura con agricultores y familias productoras del Valle del Mezquital, sin intermediarios.
+              </p>
+              <div class="pt-1 flex flex-wrap gap-2.5">
+                <button type="button" onclick="scrollToCatalog('campo')" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition" data-i18n="hero1Cta">
+                  Ver Productos del Campo
+                </button>
+                <button type="button" onclick="switchView('chat')" class="glass-pill bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition" data-i18n="openChatsCta">
+                  Abrir Chats Directos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-slide absolute inset-0 opacity-0 pointer-events-none z-0">
+          <img src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1600&q=85" alt="Textiles naturales y trabajo artesanal" class="w-full h-full object-cover object-center" />
+          <div class="absolute inset-0 bg-gradient-to-r from-[#261608]/90 via-[#3D230D]/65 to-transparent flex items-end sm:items-center p-5 sm:p-10 lg:p-14">
+            <div class="max-w-2xl text-white space-y-2.5 sm:space-y-4">
+              <span class="glass-pill inline-flex items-center gap-1.5 bg-amber-950/60 border border-amber-300/35 text-amber-200 text-[11px] sm:text-xs font-bold px-3 py-1 rounded-full" data-i18n="hero2Badge">
+                IDENTIDAD ARTESANAL Y COMUNITARIA
+              </span>
+              <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-sm" data-i18n="hero2Title">
+                Bordados, Fibras Naturales y Oficio Familiar
+              </h2>
+              <p class="text-xs sm:text-base text-stone-100/95 max-w-xl leading-relaxed" data-i18n="hero2Desc">
+                Apoya el trabajo de las familias de la región en Español, Hñähñu, Nañu o Náhuatl y acuerda entregas en puntos seguros.
+              </p>
+              <div class="pt-1 flex flex-wrap gap-2.5">
+                <button type="button" onclick="scrollToCatalog('artesanias')" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition" data-i18n="hero2Cta">
+                  Explorar Artesanías
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-slide absolute inset-0 opacity-0 pointer-events-none z-0">
+          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=85" alt="Senderos naturales y luz solar" class="w-full h-full object-cover object-center" />
+          <div class="absolute inset-0 bg-gradient-to-r from-[#0C241D]/90 via-[#12382D]/65 to-transparent flex items-end sm:items-center p-5 sm:p-10 lg:p-14">
+            <div class="max-w-2xl text-white space-y-2.5 sm:space-y-4">
+              <span class="glass-pill inline-flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-300/35 text-emerald-200 text-[11px] sm:text-xs font-bold px-3 py-1 rounded-full" data-i18n="hero3Badge">
+                TRUEQUE 2.0 • CHAT DE VOZ • MAPAS
+              </span>
+              <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-sm" data-i18n="hero3Title">
+                Intercambio Justo con Voz, Mapa y Lectura Familiar
+              </h2>
+              <p class="text-xs sm:text-base text-stone-100/95 max-w-xl leading-relaxed" data-i18n="hero3Desc">
+                Habla para buscar o chatear, escucha mensajes en voz alta, calcula equivalencias de trueque y comparte ubicación en Google Maps.
+              </p>
+              <div class="pt-1 flex flex-wrap gap-2.5">
+                <button type="button" onclick="openModal('barterModal')" class="bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition" data-i18n="hero3Cta">
+                  Calcular Trueque 2.0
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="prevHeroSlide()" class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-stone-950/50 hover:bg-stone-950/80 text-white w-11 h-11 rounded-full items-center justify-center transition" aria-label="Anterior">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button type="button" onclick="nextHeroSlide()" class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-stone-950/50 hover:bg-stone-950/80 text-white w-11 h-11 rounded-full items-center justify-center transition" aria-label="Siguiente">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <div id="heroDots" class="absolute bottom-3.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          <button type="button" onclick="goToHeroSlide(0)" class="hero-dot w-7 h-2.5 rounded-full bg-amber-400 transition-all"></button>
+          <button type="button" onclick="goToHeroSlide(1)" class="hero-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white/80 transition-all"></button>
+          <button type="button" onclick="goToHeroSlide(2)" class="hero-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white/80 transition-all"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Carrusel Secundario de Galería Natural -->
+    <section class="max-w-7xl mx-auto mt-6 px-3 sm:px-6">
+      <div class="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+          <div>
+            <h3 class="font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-images text-mezquital-forest"></i>
+              <span data-i18n="galleryTitle">Postal Natural y Comunitaria del Valle</span>
+            </h3>
+            <p class="text-xs text-stone-500" data-i18n="gallerySub">Recorre escenas naturales y de trabajo local.</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="scrollGallery(-1)" class="w-8 h-8 rounded-lg border border-stone-300 hover:bg-stone-100 flex items-center justify-center text-stone-700 text-xs">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button type="button" onclick="scrollGallery(1)" class="w-8 h-8 rounded-lg border border-stone-300 hover:bg-stone-100 flex items-center justify-center text-stone-700 text-xs">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="natureGalleryTrack" class="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth">
+          <div class="min-w-[230px] sm:min-w-[260px] snap-start rounded-xl overflow-hidden border border-stone-200 bg-stone-50 shrink-0">
+            <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=600&q=80" alt="Cosecha fresca" class="h-32 w-full object-cover" />
+            <div class="p-2.5">
+              <p class="text-xs font-bold text-stone-800" data-i18n="gal1Title">Tierra Fértil y Cosecha</p>
+              <p class="text-[11px] text-stone-500" data-i18n="gal1Desc">Hortalizas y productos de temporada</p>
+            </div>
+          </div>
+          <div class="min-w-[230px] sm:min-w-[260px] snap-start rounded-xl overflow-hidden border border-stone-200 bg-stone-50 shrink-0">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Horizonte natural" class="h-32 w-full object-cover" />
+            <div class="p-2.5">
+              <p class="text-xs font-bold text-stone-800" data-i18n="gal2Title">Horizontes del Valle</p>
+              <p class="text-[11px] text-stone-500" data-i18n="gal2Desc">Entorno natural y comunidades locales</p>
+            </div>
+          </div>
+          <div class="min-w-[230px] sm:min-w-[260px] snap-start rounded-xl overflow-hidden border border-stone-200 bg-stone-50 shrink-0">
+            <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=600&q=80" alt="Follaje natural" class="h-32 w-full object-cover" />
+            <div class="p-2.5">
+              <p class="text-xs font-bold text-stone-800" data-i18n="gal3Title">Follaje y Vida Verde</p>
+              <p class="text-[11px] text-stone-500" data-i18n="gal3Desc">Respeto por los recursos naturales</p>
+            </div>
+          </div>
+          <div class="min-w-[230px] sm:min-w-[260px] snap-start rounded-xl overflow-hidden border border-stone-200 bg-stone-50 shrink-0">
+            <img src="https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&w=600&q=80" alt="Granos y semillas" class="h-32 w-full object-cover" />
+            <div class="p-2.5">
+              <p class="text-xs font-bold text-stone-800" data-i18n="gal4Title">Granos y Trueque 2.0</p>
+              <p class="text-[11px] text-stone-500" data-i18n="gal4Desc">Intercambio directo de insumos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tarjetas de Utilidad Familiar -->
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm flex items-start gap-3.5">
+        <div class="bg-emerald-50 text-mezquital-forest border border-emerald-200 w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-stone-900 text-sm" data-i18n="seasonTitle">Temporada y Cosecha Regional</h3>
+          <p class="text-xs text-stone-600 mt-1 leading-relaxed" data-i18n="seasonDesc">
+            Noviembre: Nopal verdura, maíz criollo, miel de mezquite, ayates de ixtle y textiles bordados.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3">
+        <div class="flex items-start gap-3.5">
+          <div class="bg-amber-50 text-amber-700 border border-amber-200 w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-stone-900 text-sm" data-i18n="barterCalcTitle">Calculadora de Trueque 2.0</h3>
+            <p class="text-xs text-stone-600 mt-1 leading-relaxed" data-i18n="barterCalcDesc">
+              Equivalencias claras entre cosechas, artesanías e insumos agrícolas.
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="openModal('barterModal')" class="bg-mezquital-forest hover:bg-mezquital-deep text-white text-xs font-bold px-3.5 py-2 rounded-xl shrink-0 transition" data-i18n="openBtn">
+          Abrir
+        </button>
+      </div>
+
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm flex items-start gap-3.5">
+        <div class="bg-sky-50 text-sky-700 border border-sky-200 w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0">
+          <i class="fa-solid fa-volume-high"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-stone-900 text-sm" data-i18n="voiceHelpTitle">Chat por Voz y Lectura Familiar</h3>
+          <p class="text-xs text-stone-600 mt-1 leading-relaxed" data-i18n="voiceHelpDesc">
+            Dicta mensajes con el micrófono y escucha fichas o mensajes en voz alta con un toque.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtros y Catálogo -->
+    <section id="catalogSection" class="max-w-7xl mx-auto px-3 sm:px-6 mt-8">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3.5">
+        <div class="flex flex-wrap gap-2" id="categoryTabs">
+          <button type="button" onclick="setCategory('todos')" data-cat="todos" class="cat-btn bg-mezquital-deep text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition">
+            <i class="fa-solid fa-border-all mr-1.5"></i> <span data-i18n="catAll">Todos</span>
+          </button>
+          <button type="button" onclick="setCategory('campo')" data-cat="campo" class="cat-btn bg-white text-stone-700 hover:bg-emerald-50 border border-stone-300 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+            <i class="fa-solid fa-carrot mr-1.5 text-emerald-700"></i> <span data-i18n="catFarm">Productos del Campo</span>
+          </button>
+          <button type="button" onclick="setCategory('artesanias')" data-cat="artesanias" class="cat-btn bg-white text-stone-700 hover:bg-amber-50 border border-stone-300 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+            <i class="fa-solid fa-palette mr-1.5 text-amber-700"></i> <span data-i18n="catCraft">Artesanías y Textiles</span>
+          </button>
+          <button type="button" onclick="setCategory('insumos')" data-cat="insumos" class="cat-btn bg-white text-stone-700 hover:bg-stone-100 border border-stone-300 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+            <i class="fa-solid fa-toolbox mr-1.5 text-stone-600"></i> <span data-i18n="catSupplies">Insumos y Herramientas</span>
+          </button>
+        </div>
+
+        <label class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-stone-700 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-stone-200">
+          <input type="checkbox" id="onlyBarterFilter" onchange="renderCatalog()" class="w-4 h-4 accent-emerald-800 rounded" />
+          <span data-i18n="filterBarter">Solo con Trueque 2.0</span>
+        </label>
+      </div>
+
+      <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mt-6"></div>
+    </section>
+  </main>
+
+  <!-- VISTA 2: APARTADO DEDICADO DE CHATS ESTILO WHATSAPP -->
+  <section id="whatsappChatView" class="hidden max-w-7xl mx-auto mt-4 sm:mt-6 px-3 sm:px-6">
+    <div class="bg-white rounded-2xl shadow-md border border-stone-200 overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[580px]">
+      <aside id="waSidebar" class="md:col-span-4 lg:col-span-4 border-r border-stone-200 flex flex-col bg-white min-w-0">
+        <div class="bg-[#143D24] text-white px-4 py-3.5 flex items-center justify-between sticky top-16 sm:top-[72px] z-20">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-amber-400 text-[#143D24] flex items-center justify-center font-extrabold text-sm">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-sm sm:text-base leading-tight" data-i18n="waTitle">Chats Comunitarios</h2>
+              <p class="text-[11px] text-emerald-200" data-i18n="waSubtitle">Acuerdos directos, voz y ubicación</p>
+            </div>
+          </div>
+          <button type="button" onclick="switchView('catalog')" class="text-xs bg-white/15 hover:bg-white/25 px-2.5 py-1.5 rounded-lg font-semibold transition">
+            <i class="fa-solid fa-arrow-left mr-1"></i> <span data-i18n="backCatalog">Catálogo</span>
+          </button>
+        </div>
+
+        <div class="p-2.5 bg-stone-50 border-b border-stone-200">
+          <div class="flex items-center bg-white border border-stone-300 rounded-xl px-3 py-1.5 text-xs">
+            <i class="fa-solid fa-search text-stone-400 mr-2"></i>
+            <input id="waSearchInput" type="text" oninput="renderWhatsAppSidebar()" data-i18n-placeholder="waSearchPlaceholder" placeholder="Buscar conversación o producto..." class="w-full focus:outline-none text-stone-700" />
+          </div>
+        </div>
+
+        <div id="waChatList" class="flex-1 overflow-y-auto divide-y divide-stone-100"></div>
+      </aside>
+
+      <div id="waConversationPane" class="hidden md:flex md:col-span-8 lg:col-span-8 flex-col bg-[#EFEAE2] min-w-0">
+        <div class="bg-[#1E5631] text-white px-4 py-3 flex items-center justify-between gap-2 shadow-sm sticky top-16 sm:top-[72px] z-20">
+          <div class="flex items-center gap-3 min-w-0">
+            <button type="button" onclick="backToWaListMobile()" class="md:hidden bg-white/15 hover:bg-white/25 w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-amber-400 text-[#143D24] font-extrabold flex items-center justify-center text-sm shrink-0" id="waActiveAvatar">
+              A
+            </div>
+            <div class="min-w-0">
+              <h3 id="waActiveTitle" class="font-bold text-sm sm:text-base truncate">Selecciona un chat</h3>
+              <p id="waActiveSub" class="text-[11px] text-emerald-100 truncate">Punto de encuentro y producto</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+            <label for="partnerLangSelect" class="sr-only">Idioma del otro usuario</label>
+            <select id="partnerLangSelect" onchange="setPartnerLanguage(this.value)" class="bg-white/95 text-stone-900 font-bold text-[11px] px-2 py-1.5 rounded-lg border border-emerald-200 focus:outline-none cursor-pointer" title="Idioma en el que habla o escribe la otra persona">
+              <option value="es">Otro: Español</option>
+              <option value="oto">Otro: Hñähñu (Otomí)</option>
+              <option value="nanu">Otro: Nañu</option>
+              <option value="nah">Otro: Náhuatl</option>
+            </select>
+            <button type="button" onclick="shareMeetingLocation()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm transition" title="Compartir ubicación en Google Maps">
+              <i class="fa-solid fa-location-dot"></i>
+              <span class="hidden sm:inline" data-i18n="shareMapBtn">Mapa</span>
+            </button>
+            <button type="button" onclick="registerClosedDeal()" class="bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm transition" title="Registrar trato cerrado">
+              <i class="fa-solid fa-handshake-simple"></i>
+              <span class="hidden sm:inline" data-i18n="closeDealBtn">Trato</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="waMessagesContainer" class="wa-bg flex-1 p-4 overflow-y-auto space-y-3 max-h-[420px]"></div>
+
+        <form onsubmit="sendChatMessage(event)" class="bg-[#F0F2F5] px-3 py-2.5 border-t border-stone-300 flex items-center gap-2">
+          <button type="button" id="chatMicBtn" onclick="dictateChatMessage()" class="bg-white hover:bg-emerald-50 text-mezquital-forest border border-stone-300 w-10 h-10 rounded-full flex items-center justify-center transition shrink-0 shadow-sm" title="Hablar por voz para dictar mensaje">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <input id="chatTextInput" type="text" data-i18n-placeholder="chatInputPlaceholder" placeholder="Escribe o dicta por voz tu mensaje..." class="flex-1 bg-white border border-stone-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-emerald-700" required />
+          <button type="submit" class="bg-[#143D24] hover:bg-[#1E5631] text-white w-10 h-10 rounded-full flex items-center justify-center transition shrink-0 shadow-sm" title="Enviar mensaje">
+            <i class="fa-solid fa-paper-plane text-sm"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Acceso Rápido Inferior para Móviles -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-stone-200 z-40 px-2 py-1.5 flex justify-around items-center text-[11px] font-bold text-stone-700 shadow-lg">
+    <button type="button" onclick="switchView('catalog')" class="flex flex-col items-center py-1 px-2 text-mezquital-deep">
+      <i class="fa-solid fa-store text-base mb-0.5"></i>
+      <span data-i18n="navCatalog">Catálogo</span>
+    </button>
+    <button type="button" onclick="startVoiceSearch()" class="flex flex-col items-center py-1 px-2 text-mezquital-forest">
+      <i class="fa-solid fa-microphone text-base mb-0.5"></i>
+      <span data-i18n="voiceShort">Voz</span>
+    </button>
+    <button type="button" onclick="openPublishModal()" class="flex flex-col items-center py-1 px-3 -mt-4 bg-amber-500 text-stone-950 rounded-2xl shadow">
+      <i class="fa-solid fa-plus text-base"></i>
+      <span data-i18n="publishBtn">Publicar</span>
+    </button>
+    <button type="button" onclick="switchView('chat')" class="relative flex flex-col items-center py-1 px-2 text-stone-700">
+      <i class="fa-solid fa-comments text-base mb-0.5"></i>
+      <span data-i18n="navChat">Chats</span>
+    </button>
+    <button type="button" onclick="openProfileOrAuth()" class="flex flex-col items-center py-1 px-2 text-stone-700">
+      <i class="fa-solid fa-user text-base mb-0.5"></i>
+      <span data-i18n="profileShort">Perfil</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: PUBLICAR PRODUCTO -->
+  <div id="publishModal" class="hidden fixed inset-0 bg-stone-950/65 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base sm:text-lg" data-i18n="pubModalTitle"><i class="fa-solid fa-plus-circle mr-2 text-amber-400"></i>Publicar Producto o Artesanía</h3>
+        <button type="button" onclick="closeModal('publishModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="publishForm" onsubmit="handlePublishProduct(event)" class="p-5 space-y-4 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold block mb-1 text-stone-800" data-i18n="pubCatLabel">Categoría</label>
+            <select id="prodCat" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white">
+              <option value="campo" data-i18n="catFarm">Productos del Campo</option>
+              <option value="artesanias" data-i18n="catCraft">Artesanías y Textiles</option>
+              <option value="insumos" data-i18n="catSupplies">Insumos y Herramientas</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold block mb-1 text-stone-800" data-i18n="pubFreshLabel">Disponibilidad y Frescura</label>
+            <select id="prodFreshness" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white">
+              <option value="Cosechado Hoy" data-i18n="freshToday">Cosechado Hoy</option>
+              <option value="Disponible esta semana" data-i18n="freshWeek">Disponible esta semana</option>
+              <option value="Bajo pedido artesanal (3 días)" data-i18n="freshOrder">Bajo pedido artesanal (3 días)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800" data-i18n="pubNameLabel">Nombre del Producto</label>
+          <input id="prodTitle" type="text" required placeholder="Ej. Nopal verdura limpio o Camino de mesa bordado" class="w-full border border-stone-300 rounded-xl p-2.5" />
+        </div>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800" data-i18n="pubDescLabel">Descripción (con dictado por voz)</label>
+          <div class="flex gap-2">
+            <textarea id="prodDesc" rows="2" required placeholder="Detalles de calidad, cosecha o tejido..." class="w-full border border-stone-300 rounded-xl p-2.5"></textarea>
+            <button type="button" onclick="dictateDescription()" class="bg-stone-100 hover:bg-emerald-100 border border-stone-300 px-3.5 rounded-xl text-mezquital-forest transition" title="Dictar descripción por voz">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3.5 space-y-3">
+          <div class="text-xs font-extrabold text-mezquital-deep uppercase tracking-wide">Modalidad, Presentación y Precios</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs">Modalidad de Venta</label>
+              <select id="prodSaleMode" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white text-xs font-semibold">
+                <option value="Menudeo">Menudeo</option>
+                <option value="Mayoreo">Mayoreo</option>
+                <option value="Mayoreo y Menudeo">Mayoreo y Menudeo</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs">Tipo de Venta / Presentación</label>
+              <select id="prodUnit" onchange="toggleKiloPriceField()" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white text-xs font-semibold">
+                <option value="Kilos">Por Kilos (kg)</option>
+                <option value="Piezas">Por Pieza</option>
+                <option value="Docenas">Por Docena</option>
+                <option value="Cubetas">Por Cubeta</option>
+                <option value="Litros">Por Litro</option>
+                <option value="Sacos">Por Saco</option>
+                <option value="Manojos">Por Manojo / Atado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs" data-i18n="pubPriceLabel">Precio Unitario ($)</label>
+              <input id="prodPrice" type="number" min="1" step="0.5" required placeholder="25" oninput="syncKiloFromUnitIfKilos()" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white" />
+            </div>
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs">Precio por Kilo ($/kg)</label>
+              <input id="prodPricePerKilo" type="number" min="0" step="0.5" placeholder="Ej. 18" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white" />
+            </div>
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs" data-i18n="pubQtyLabel">Cantidad Disponible</label>
+              <input id="prodQty" type="number" min="1" required placeholder="20" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs">Precio Mayoreo Ref. ($)</label>
+              <input id="prodWholesalePrice" type="number" min="0" step="0.5" placeholder="Ej. 15 (opcional)" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white" />
+            </div>
+            <div>
+              <label class="font-bold block mb-1 text-stone-800 text-xs">Mínimo para Mayoreo</label>
+              <input id="prodWholesaleMin" type="text" placeholder="Ej. Desde 10 kg o 5 cajas" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white" />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800" data-i18n="pubLocLabel">Comunidad / Punto Público de Encuentro</label>
+          <input id="prodLocation" type="text" required placeholder="Ej. Plaza Principal de Progreso de Obregón, Hidalgo" class="w-full border border-stone-300 rounded-xl p-2.5" />
+        </div>
+
+        <div class="bg-amber-50/90 p-3.5 rounded-xl border border-amber-200">
+          <label class="flex items-center gap-2 font-bold text-amber-950 cursor-pointer">
+            <input id="prodBarterCheck" type="checkbox" onchange="document.getElementById('barterNeedBox').classList.toggle('hidden')" class="w-4 h-4 accent-amber-600 rounded" />
+            <span data-i18n="pubBarterLabel">Acepto Trueque 2.0 (Intercambio directo)</span>
+          </label>
+          <div id="barterNeedBox" class="hidden mt-2.5">
+            <input id="prodBarterNeed" type="text" placeholder="¿Qué buscas a cambio? Ej. Abono orgánico, maíz criollo, hilo..." class="w-full border border-amber-300 rounded-xl p-2.5 bg-white" />
+          </div>
+        </div>
+
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3">
+          <label class="font-bold block mb-1 text-stone-900 text-xs" data-i18n="pubImgLabel">Fotografía del Producto (Obligatoria)</label>
+          <input id="prodImageInput" type="file" accept="image/*" required onchange="previewProductImg(event)" class="w-full text-xs text-stone-700" />
+          <p id="prodImgStatus" class="hidden text-[11px] font-semibold text-emerald-700 mt-1">Fotografía cargada y lista para guardar.</p>
+          <img id="prodImagePreview" class="hidden mt-2.5 h-32 w-full object-cover rounded-xl border border-stone-200" />
+        </div>
+
+        <button type="submit" class="w-full bg-mezquital-deep hover:bg-mezquital-forest text-white font-bold py-3 rounded-xl shadow-sm transition" data-i18n="pubSubmitBtn">
+          Publicar en el Catálogo Comunitario
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PERFIL / CUENTA / HISTORIAL -->
+  <div id="profileModal" class="hidden fixed inset-0 bg-stone-950/65 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base sm:text-lg" data-i18n="profModalTitle"><i class="fa-solid fa-id-card mr-2 text-amber-400"></i>Perfil Comunitario y Cuenta</h3>
+        <button type="button" onclick="closeModal('profileModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="profileModalContent" class="p-5 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: CALCULADORA DE TRUEQUE 2.0 -->
+  <div id="barterModal" class="hidden fixed inset-0 bg-stone-950/65 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-stone-200">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base sm:text-lg" data-i18n="barterModalTitle"><i class="fa-solid fa-scale-balanced mr-2 text-amber-400"></i>Calculadora de Trueque 2.0</h3>
+        <button type="button" onclick="closeModal('barterModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-4 text-sm">
+        <p class="text-stone-600 text-xs leading-relaxed" data-i18n="barterModalDesc">
+          Calcula una equivalencia justa sin usar dinero según el valor de referencia en tianguis regionales del Valle del Mezquital.
+        </p>
+        <div>
+          <label class="font-bold block mb-1 text-stone-800" data-i18n="barterOfferLabel">Producto que ofreces:</label>
+          <div class="flex gap-2">
+            <select id="calcItemA" onchange="calculateBarter()" class="flex-1 border border-stone-300 rounded-xl p-2.5 bg-white">
+              <option value="25">Nopal limpio ($25 / kg)</option>
+              <option value="130">Miel de mezquite ($130 / litro)</option>
+              <option value="18">Maíz criollo ($18 / kg)</option>
+              <option value="480">Camino de mesa bordado ($480 / pza)</option>
+            </select>
+            <input id="calcQtyA" type="number" value="10" min="1" oninput="calculateBarter()" class="w-20 border border-stone-300 rounded-xl p-2.5 text-center font-bold" />
+          </div>
+        </div>
+        <div>
+          <label class="font-bold block mb-1 text-stone-800" data-i18n="barterSeekLabel">Insumo o producto que buscas recibir:</label>
+          <select id="calcItemB" onchange="calculateBarter()" class="w-full border border-stone-300 rounded-xl p-2.5 bg-white">
+            <option value="50">Saco de abono orgánico ($50 / saco)</option>
+            <option value="45">Madeja de hilo algodón ($45 / pza)</option>
+            <option value="32">Frijol bayo ($32 / kg)</option>
+            <option value="220">Ayate de ixtle ($220 / pza)</option>
+          </select>
+        </div>
+        <div id="calcResultBox" class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+          <p class="text-xs text-emerald-900 font-semibold" data-i18n="barterResultLabel">Equivalencia Sugerida:</p>
+          <p id="calcResultText" class="text-lg font-extrabold text-mezquital-deep mt-1">5.0 unidades equivalentes ($250 MXN ref.)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CÓDIGO QR -->
+  <div id="qrModal" class="hidden fixed inset-0 bg-stone-950/65 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-stone-200 text-center">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base" data-i18n="qrModalTitle"><i class="fa-solid fa-qrcode mr-2 text-amber-400"></i>Ficha QR para Tianguis</h3>
+        <button type="button" onclick="closeModal('qrModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 flex flex-col items-center space-y-3">
+        <p id="qrProductTitle" class="font-bold text-stone-900"></p>
+        <div id="qrcodeContainer" class="p-3 bg-white border border-stone-200 rounded-xl"></div>
+        <p class="text-xs text-stone-500" data-i18n="qrModalDesc">Escanea en el punto de venta o tianguis para consultar los datos del producto.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RESEÑAS Y CALIFICACIÓN DE 5 ESTRELLAS -->
+  <div id="reviewsModal" class="hidden fixed inset-0 bg-stone-950/65 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base" data-i18n="revModalTitle"><i class="fa-solid fa-star mr-2 text-amber-400"></i>Comentarios y Calificación</h3>
+        <button type="button" onclick="closeModal('reviewsModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-4 text-sm">
+        <div id="reviewsList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        <form onsubmit="submitReview(event)" class="border-t border-stone-200 pt-3 space-y-2.5">
+          <label class="font-bold block text-xs text-stone-800" data-i18n="revFormLabel">Califica este producto y el trato del productor o comprador:</label>
+          <select id="reviewStars" class="w-full border border-stone-300 rounded-xl p-2.5 text-amber-700 font-bold bg-white">
+            <option value="5">5 estrellas — Excelente calidad y trato</option>
+            <option value="4">4 estrellas — Muy bueno</option>
+            <option value="3">3 estrellas — Regular</option>
+            <option value="2">2 estrellas — Deficiente</option>
+            <option value="1">1 estrella — Malo</option>
+          </select>
+          <input id="reviewComment" type="text" required placeholder="Escribe tu comentario comunitario..." class="w-full border border-stone-300 rounded-xl p-2.5" />
+          <button type="submit" class="w-full bg-mezquital-deep hover:bg-mezquital-forest text-white font-bold py-2.5 rounded-xl transition" data-i18n="revSubmitBtn">
+            Publicar Reseña
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL: REGISTRO OBLIGATORIO Y ACUERDOS LEGALES -->
+  <div id="registerAccountModal" class="hidden fixed inset-0 bg-stone-950/75 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-user-shield mr-2 text-amber-400"></i>Registro Obligatorio y Acuerdos Legales</h3>
+        <button type="button" onclick="closeModal('registerAccountModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="mandatoryRegisterForm" onsubmit="completeAccountRegistration(event)" class="p-5 space-y-3.5 text-sm">
+        <p class="text-xs text-stone-600 bg-amber-50 border border-amber-200 rounded-xl p-3 leading-relaxed">
+          Para publicar productos o enviar mensajes en el chat es <strong>obligatorio</strong> registrar tu cuenta con tu correo electrónico y aceptar los acuerdos legales y los Usos y Términos de Condiciones de <strong>MEZQUITALCONECTA</strong>.
+        </p>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800">Nombre Completo</label>
+          <input id="regFullName" type="text" required placeholder="Ej. Cristian Contreras" class="w-full border border-stone-300 rounded-xl p-2.5" />
+        </div>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800">Correo Electrónico Obligatorio</label>
+          <input id="regEmail" type="email" required placeholder="nombre@correo.com" class="w-full border border-stone-300 rounded-xl p-2.5" />
+        </div>
+
+        <div>
+          <label class="font-bold block mb-1 text-stone-800">Comunidad o Municipio en el Valle del Mezquital</label>
+          <input id="regCommunity" type="text" required placeholder="Ej. Progreso de Obregón, Hidalgo" class="w-full border border-stone-300 rounded-xl p-2.5" />
+        </div>
+
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-2 text-xs text-stone-700">
+          <p class="font-bold text-stone-900">Acuerdos Legales Comunitarios:</p>
+          <ul class="list-disc pl-4 space-y-1">
+            <li>Declaro que la información, precios, cantidades y fotografías que publique son verídicos y corresponden a productos agrícolas, artesanías o insumos lícitos.</li>
+            <li>Me comprometo a mantener un trato respetuoso en los chats y a realizar intercambios o entregas en lugares públicos seguros.</li>
+            <li>Acepto la moderación automática por lenguaje ofensivo o malas palabras: <strong>1ª falta = advertencia</strong>; <strong>reincidencia = bloqueo total de la app y restricción de chat por 3 días</strong>.</li>
+          </ul>
+        </div>
+
+        <label class="flex items-start gap-2.5 text-xs font-bold text-stone-800 cursor-pointer pt-1">
+          <input id="regAcceptTermsCheck" type="checkbox" required class="w-4 h-4 accent-emerald-800 rounded mt-0.5 shrink-0" />
+          <span>Acepto los acuerdos legales y los <button type="button" onclick="openModal('termsModal')" class="underline text-mezquital-forest hover:text-mezquital-deep">Usos y Términos de Condiciones</button> de MEZQUITALCONECTA.</span>
+        </label>
+
+        <button type="submit" class="w-full bg-mezquital-deep hover:bg-mezquital-forest text-white font-bold py-3 rounded-xl shadow-sm transition">
+          Registrar Cuenta y Aceptar Acuerdos
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: USOS Y TÉRMINOS DE CONDICIONES -->
+  <div id="termsModal" class="hidden fixed inset-0 bg-stone-950/75 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto">
+      <div class="bg-mezquital-deep text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-scale-balanced mr-2 text-amber-400"></i>Usos y Términos de Condiciones</h3>
+        <button type="button" onclick="closeModal('termsModal')" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-3 text-xs text-stone-700 leading-relaxed">
+        <p><strong>1. Registro Obligatorio y Correo Electrónico:</strong> Toda persona que desee publicar productos o enviar mensajes en el chat debe registrar su cuenta con un correo electrónico válido, nombre y comunidad, aceptando expresamente los acuerdos legales.</p>
+        <p><strong>2. Uso Comunitario Responsable:</strong> MEZQUITALCONECTA es una red de enlace directo para productos del campo, artesanías, insumos y Trueque 2.0 en el Valle del Mezquital, Hidalgo. Queda prohibido publicar artículos ilícitos, engañosos o de procedencia dudosa.</p>
+        <p><strong>3. Conducta en el Chat, Palabras Prohibidas y Sanción de 3 Días:</strong> Está estrictamente prohibido enviar insultos, amenazas, acoso o malas palabras/groserías (incluyendo términos como: <em>pendejo, pendeja, idiota, imbécil, estúpido, estupida, mierda, cabron, cabrón, puta, puto, verga, chingar, chingada, maldito, maldita, perra, zorra</em>).</p>
+        <p class="bg-red-50 border border-red-200 text-red-900 rounded-xl p-3 font-semibold">
+          4. Régimen de Advertencia y Penalización de 3 Días: Si un usuario envía un mensaje con malas palabras o lenguaje ofensivo, recibe <strong>una (1) advertencia</strong>. Si vuelve a incurrir después de su advertencia, <strong>no se le permitirá hacer nada en la aplicación</strong> (bloqueo de publicación, chat y acciones) y se aplicará una sanción activa de <strong>3 días</strong> sin poder chatear ni operar en la app.
+        </p>
+        <p><strong>5. Acuerdos Presenciales y Seguridad:</strong> Los acuerdos de compra o trueque se coordinan directamente entre las partes y se recomienda concretarlos en puntos visibles y seguros.</p>
+        <button type="button" onclick="closeModal('termsModal')" class="w-full bg-mezquital-deep hover:bg-mezquital-forest text-white font-bold py-2.5 rounded-xl transition mt-2">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL PROFESIONAL DE MODERACIÓN (ADVERTENCIA / BLOQUEO 3 DÍAS / EXPULSIÓN) -->
+  <div id="moderationAlertModal" class="hidden fixed inset-0 bg-stone-950/80 z-[60] flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border-2 border-red-200">
+      <div id="modModalHeader" class="bg-gradient-to-r from-red-700 via-red-600 to-rose-700 text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-extrabold text-sm sm:text-base tracking-wide">
+          <i id="modModalHeaderIcon" class="fa-solid fa-triangle-exclamation text-amber-200"></i>
+          <span id="modModalTitle">Aviso de Moderación Comunitaria</span>
+        </div>
+        <button type="button" onclick="closeModal('moderationAlertModal')" class="text-white/85 hover:text-white text-xl leading-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-5 text-center space-y-4">
+        <div class="mx-auto w-24 h-24 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center shadow-inner">
+          <svg id="modAlertSvg" viewBox="0 0 96 96" class="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="48" cy="48" r="40" fill="#FEE2E2" stroke="#DC2626" stroke-width="3"/>
+            <path d="M48 24L72 66H24L48 24Z" fill="#DC2626" stroke="#991B1B" stroke-width="2.5" stroke-linejoin="round"/>
+            <rect x="45.5" y="38" width="5" height="16" rx="2.5" fill="#FFFFFF"/>
+            <circle cx="48" cy="60" r="3" fill="#FFFFFF"/>
+          </svg>
+        </div>
+
+        <div class="space-y-1.5">
+          <span id="modLevelBadge" class="inline-block bg-red-100 text-red-800 border border-red-300 text-[11px] font-extrabold px-3 py-0.5 rounded-full uppercase">
+            Advertencia 1 de 2
+          </span>
+          <h4 id="modHeading" class="text-lg font-black text-stone-900">Lenguaje ofensivo detectado</h4>
+          <p id="modDescription" class="text-xs sm:text-sm text-stone-700 leading-relaxed"></p>
+        </div>
+
+        <div id="modDetailBox" class="bg-red-50/90 border border-red-200 rounded-xl p-3 text-left text-xs text-red-950 space-y-1"></div>
+
+        <button type="button" onclick="closeModal('moderationAlertModal')" class="w-full bg-red-700 hover:bg-red-800 active:scale-[0.99] text-white font-extrabold py-2.5 rounded-xl shadow transition">
+          Entendido, cuidaré mi lenguaje
+        </button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL: PANEL DE ADMINISTRADOR SUPREMO (monty555) -->
+  <div id="adminPanelModal" class="hidden fixed inset-0 bg-stone-950/80 z-[65] flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl border-2 border-red-300 max-h-[92vh] flex flex-col">
+      <div class="bg-gradient-to-r from-stone-900 via-red-900 to-red-700 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-400 text-stone-950 flex items-center justify-center font-black">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base leading-tight">Modo Administrador Supremo • MEZQUITALCONECTA</h3>
+            <p class="text-[11px] text-red-100">Moderación total de catálogo, eliminaciones con motivo y control de sanciones</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeModal('adminPanelModal')" class="text-white/85 hover:text-white text-xl leading-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-5 text-sm">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="text-red-950">
+            <strong>Estado Admin Activo:</strong> Puedes eliminar cualquier publicación especificando la causa oficial o un motivo específico.
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="resetAllModerationFromAdmin()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg transition">
+              Limpiar Sanciones
+            </button>
+            <button type="button" onclick="exitAdminMode()" class="bg-stone-800 hover:bg-stone-700 text-white font-bold px-3 py-1.5 rounded-lg transition">
+              Salir Modo Admin
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulario para eliminar publicación con motivo -->
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-3">
+          <h4 class="font-extrabold text-stone-900 text-xs sm:text-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-trash-can text-red-600"></i> Eliminar Publicación con Motivo Oficial
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-xs block mb-1 text-stone-700">Selecciona la publicación a eliminar:</label>
+              <select id="adminTargetProductSelect" class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white font-semibold"></select>
+            </div>
+            <div>
+              <label class="font-bold text-xs block mb-1 text-stone-700">Categoría del motivo:</label>
+              <select id="adminDeleteCategory" class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white font-semibold">
+                <option value="Incumplir normas de la comunidad">Incumplir normas de la comunidad</option>
+                <option value="Motivo específico del administrador">Motivo específico del administrador</option>
+                <option value="Información falsa o precios engañosos">Información falsa o precios engañosos</option>
+                <option value="Producto prohibido o no permitido">Producto prohibido o no permitido</option>
+                <option value="Lenguaje ofensivo o falta de respeto">Lenguaje ofensivo o falta de respeto</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-xs block mb-1 text-stone-700">Explica el porqué de la eliminación (visible en el registro comunitario):</label>
+            <textarea id="adminDeleteReasonInput" rows="2" placeholder="Escribe aquí el motivo específico por el cual se elimina esta publicación..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white"></textarea>
+          </div>
+          <button type="button" onclick="confirmAdminDeleteProduct()" class="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-ban"></i> Eliminar Publicación y Registrar Motivo
+          </button>
+        </div>
+
+        <!-- Registro de Publicaciones Eliminadas por Administración -->
+        <div>
+          <h4 class="font-extrabold text-stone-900 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-clipboard-list text-red-700"></i> Publicaciones Eliminadas por Administración (Con Motivo)
+          </h4>
+          <div id="adminDeletedLogsList" class="space-y-2 max-h-52 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL: ELIMINAR PUBLICACIÓN SELECCIONADA DEL CATÁLOGO (ADMIN) -->
+  <div id="adminSingleDeleteModal" class="hidden fixed inset-0 bg-stone-950/80 z-[70] flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border-2 border-red-300">
+      <div class="bg-gradient-to-r from-red-800 via-red-700 to-rose-700 text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-extrabold text-sm sm:text-base">
+          <i class="fa-solid fa-trash-can text-amber-300"></i>
+          <span>Eliminar Publicación Seleccionada</span>
+        </div>
+        <button type="button" onclick="closeModal('adminSingleDeleteModal')" class="text-white/85 hover:text-white text-xl leading-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="submitSingleAdminDelete(event)" class="p-5 space-y-3.5 text-sm">
+        <input type="hidden" id="singleAdminDeleteProductId" />
+
+        <div id="singleAdminDeletePreview" class="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3"></div>
+
+        <div>
+          <label class="font-bold text-xs block mb-1 text-stone-800">Motivo de la eliminación:</label>
+          <select id="singleAdminDeleteCategory" class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white font-semibold">
+            <option value="Incumplir normas de la comunidad">Incumplir normas de la comunidad</option>
+            <option value="Motivo específico del administrador">Motivo específico del administrador</option>
+            <option value="Información falsa o precios engañosos">Información falsa o precios engañosos</option>
+            <option value="Producto prohibido o no permitido">Producto prohibido o no permitido</option>
+            <option value="Lenguaje ofensivo o falta de respeto">Lenguaje ofensivo o falta de respeto</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold text-xs block mb-1 text-stone-800">Explica el porqué (obligatorio):</label>
+          <textarea id="singleAdminDeleteReason" rows="3" required placeholder="Escribe aquí la razón específica por la que eliminas esta publicación de esta persona..." class="w-full border border-stone-300 rounded-xl p-2.5 text-xs bg-white"></textarea>
+        </div>
+
+        <div class="flex items-center gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('adminSingleDeleteModal')" class="w-1/3 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold py-2.5 rounded-xl text-xs transition">
+            Cancelar
+          </button>
+          <button type="submit" class="w-2/3 bg-red-700 hover:bg-red-800 text-white font-extrabold py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-trash-can"></i> Confirmar y Borrar Publicación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

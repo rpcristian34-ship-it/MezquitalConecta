@@ -1,0 +1,16 @@
+{
+  "name": "MEZQUITALCONECTA - Red Familiar Agrícola y Artesanal",
+  "short_name": "MezquitalConecta",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#143D24",
+  "theme_color": "#143D24",
+  "description": "Plataforma PWA familiar y comunitaria para agricultores y artesanos del Valle del Mezquital, Hidalgo.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
